@@ -4,14 +4,15 @@ body {
 }
 
 .app-container {
+  display: grid;
   grid-template-columns: 1fr;
+  gap: 20px;
 }
 
 @media screen and (min-width: 600px) {
   .app-container {
     display: grid;
     grid-template-columns: 200px 1fr;
-    gap: 20px;
   }
 }
 
