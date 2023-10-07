@@ -1,16 +1,14 @@
-import React, { useId } from "react";
+import React from "react";
 import { useState } from "react";
 import "./App.css";
 
 type Note = {
-  id: string;
+  id: number;
   title: string;
   content: string;
 };
 
 const App = () => {
-  const noteId = useId();
-
   const [notes, setNotes] = useState<Note[]>([]);
 
   const [title, setTitle] = useState("");
@@ -22,7 +20,7 @@ const App = () => {
     event.preventDefault();
 
     const newNote: Note = {
-      id: noteId,
+      id: notes.length + 1,
       title: title,
       content: content,
     };
@@ -68,7 +66,7 @@ const App = () => {
 
   const deleteNote = (
     event: React.MouseEvent | React.TouchEvent,
-    noteId: string
+    noteId: number
   ) => {
     event.stopPropagation();
 
