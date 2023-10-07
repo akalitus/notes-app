@@ -11,28 +11,7 @@ type Note = {
 const App = () => {
   const noteId = useId();
 
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: "1",
-      title: "note title 1",
-      content: "note content 1",
-    },
-    {
-      id: "2",
-      title: "note title 2",
-      content: "note content 2",
-    },
-    {
-      id: "3",
-      title: "note title 3",
-      content: "note content 3",
-    },
-    {
-      id: "4",
-      title: "note title 4",
-      content: "note content 4",
-    },
-  ]);
+  const [notes, setNotes] = useState<Note[]>([]);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -146,25 +125,29 @@ const App = () => {
       </form>
 
       <div className="notes-grid">
-        {notes.map((note) => (
-          <div
-            onClick={() => handleNoteClick(note)}
-            key={note.id}
-            className="note-item"
-          >
-            <div className="notes-header">
-              <button
-                onClick={(event) => deleteNote(event, note.id)}
-                className="button button_type_delete"
-              >
-                x
-              </button>
-            </div>
+        {notes.length ? (
+          notes.map((note) => (
+            <div
+              onClick={() => handleNoteClick(note)}
+              key={note.id}
+              className="note-item"
+            >
+              <div className="notes-header">
+                <button
+                  onClick={(event) => deleteNote(event, note.id)}
+                  className="button button_type_delete"
+                >
+                  x
+                </button>
+              </div>
 
-            <h2>{note.title}</h2>
-            <p>{note.content}</p>
-          </div>
-        ))}
+              <h2>{note.title}</h2>
+              <p>{note.content}</p>
+            </div>
+          ))
+        ) : (
+          <p className="notes-grid__empty">No Notes Here Yet</p>
+        )}
       </div>
     </div>
   );
