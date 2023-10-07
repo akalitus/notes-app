@@ -72,11 +72,11 @@ const App = () => {
       content: content,
     };
 
-    const updatedNotesList = notes.map((note) =>
+    const updatedNotes = notes.map((note) =>
       note.id === selectedNote.id ? updatedNote : note
     );
 
-    setNotes(updatedNotesList);
+    setNotes(updatedNotes);
     setTitle("");
     setContent("");
   };
@@ -85,6 +85,17 @@ const App = () => {
     setTitle("");
     setContent("");
     setSelectedNote(null);
+  };
+
+  const deleteNote = (
+    event: React.MouseEvent | React.TouchEvent,
+    noteId: string
+  ) => {
+    event.stopPropagation();
+
+    const updatedNotes = notes.filter((note) => note.id !== noteId);
+
+    setNotes(updatedNotes);
   };
 
   return (
@@ -142,7 +153,12 @@ const App = () => {
             className="note-item"
           >
             <div className="notes-header">
-              <button className="button button_type_delete">x</button>
+              <button
+                onClick={(event) => deleteNote(event, note.id)}
+                className="button button_type_delete"
+              >
+                x
+              </button>
             </div>
 
             <h2>{note.title}</h2>
