@@ -1,22 +1,20 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
+import fetchData from "./data/fetchData";
 import "./App.css";
-
-type Note = {
-  id: number;
-  title: string;
-  content: string;
-};
+import { Note } from "./data/types";
 
 const App = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const { baseUrl, notesRoute } = fetchData;
 
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/notes");
+        const response = await fetch(`${baseUrl}${notesRoute}`);
 
         const notes: Note[] = await response.json();
         setNotes(notes);
@@ -26,16 +24,30 @@ const App = () => {
     }
 
     fetchNotes();
-  }, [])
+  }, [baseUrl, notesRoute])
 
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const resetForm = () => {
+    setTitle("");
+    setContent("");
+  }
+
+  const handleNoteClick = (note: Note) => {
+    setSelectedNote(note);
+    setTitle(note.title);
+    setContent(note.content);
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    setSelectedNote(null);
+  };
 
   const addNote = async (event: React.FormEvent) => {
     event.preventDefault();
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/notes",
+        `${baseUrl}${notesRoute}`,
         {
           method: "POST",
           headers: {
@@ -50,17 +62,10 @@ const App = () => {
 
       const newNote = await response.json();
       setNotes([...notes, newNote]);
-      setTitle("");
-      setContent("");
+      resetForm();
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleNoteClick = (note: Note) => {
-    setSelectedNote(note);
-    setTitle(note.title);
-    setContent(note.content);
   };
 
   const updateNote = async (event: React.FormEvent) => {
@@ -72,7 +77,7 @@ const App = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/notes/${selectedNote.id}`,
+        `${baseUrl}${notesRoute}${selectedNote.id}`,
         {
           method: "PUT",
           headers: {
@@ -91,17 +96,10 @@ const App = () => {
       );
 
       setNotes(updatedNotes);
-      setTitle("");
-      setContent("");
+      handleCancel();
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleCancel = () => {
-    setTitle("");
-    setContent("");
-    setSelectedNote(null);
   };
 
   const deleteNote = async (
@@ -112,7 +110,7 @@ const App = () => {
 
     try {
       await fetch(
-        `http://localhost:5000/api/notes/${noteId}`,
+        `${baseUrl}${notesRoute}${noteId}`,
         {
           method: "DELETE",
         }
@@ -120,6 +118,7 @@ const App = () => {
 
       const updatedNotes = notes.filter((note) => note.id !== noteId);
       setNotes(updatedNotes);
+      handleCancel();
     } catch (error) {
       console.log(error);
     }
@@ -172,15 +171,15 @@ const App = () => {
         )}
       </form>
 
-      <div className="notes-grid">
+      <ul className="notes">
         {notes.length ? (
           notes.map((note) => (
-            <div
+            <li
               onClick={() => handleNoteClick(note)}
               key={note.id}
-              className="note-item"
+              className="notes__item"
             >
-              <div className="notes-header">
+              <div className="notes__item-head">
                 <button
                   onClick={(event) => deleteNote(event, note.id)}
                   className="button button_type_delete"
@@ -189,14 +188,14 @@ const App = () => {
                 </button>
               </div>
 
-              <h2>{note.title}</h2>
+              <h2>{note.title}{" "}{note.id}</h2>
               <p>{note.content}</p>
-            </div>
+            </li>
           ))
         ) : (
-          <p className="notes-grid__empty">No Notes Here Yet</p>
+          <p className="notes__empty">No Notes Here Yet</p>
         )}
-      </div>
+      </ul>
     </div>
   );
 };
