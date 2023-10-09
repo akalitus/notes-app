@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
+import errorData from "./data/errorData";
+import routeData from "./data/routeData";
 
 const PORT = 5000;
 
@@ -10,17 +12,17 @@ const prisma = new PrismaClient();
 app.use(express.json());
 app.use(cors());
 
-app.get("/api/notes", async (req, res) => {
+app.get(routeData.notes, async (req, res) => {
   const notes = await prisma.note.findMany();
 
   res.json(notes);
 });
 
-app.post("/api/notes", async (req, res) => {
+app.post(routeData.notes, async (req, res) => {
   const { title, content } = req.body;
 
   if (!title || !content) {
-    return res.status(400).send("title and content fields required");
+    return res.status(400).send(errorData.requiredError);
   }
 
   try {
@@ -30,20 +32,20 @@ app.post("/api/notes", async (req, res) => {
 
     res.json(note);
   } catch (error) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(errorData.internalServerError);
   }
 });
 
-app.put("/api/notes/:id", async (req, res) => {
+app.put(routeData.noteId, async (req, res) => {
   const { title, content } = req.body;
   const id = parseInt(req.params.id);
 
   if (!title || !content) {
-    return res.status(400).send("title and content fields required");
+    return res.status(400).send(errorData.requiredError);
   }
 
   if (!id || isNaN(id)) {
-    return res.status(400).send("ID must be a valid number");
+    return res.status(400).send(errorData.idError);
   }
 
   try {
@@ -54,15 +56,15 @@ app.put("/api/notes/:id", async (req, res) => {
 
     res.json(updatedNote);
   } catch (error) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(errorData.internalServerError);
   }
 });
 
-app.delete("/api/notes/:id", async (req, res) => {
+app.delete(routeData.noteId, async (req, res) => {
   const id = parseInt(req.params.id);
 
   if (!id || isNaN(id)) {
-    return res.status(400).send("ID must be a valid number");
+    return res.status(400).send(errorData.idError);
   }
 
   try {
@@ -72,7 +74,7 @@ app.delete("/api/notes/:id", async (req, res) => {
 
     res.status(204).send();
   } catch (error) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(errorData.internalServerError);
   }
 });
 
